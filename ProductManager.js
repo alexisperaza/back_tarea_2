@@ -55,10 +55,12 @@ class ProductManager {
     const products = await this.getProducts();
     const index = products.findIndex(product => product.id === id);
 
+    //validar sin el id existe
     if (index !== -1) {
-      products[index] = { ...products[index], ...updatedFields };
-      await this.saveProducts(products);
-      return products[index];
+        //Agregar los campos modificados al producto
+        products[index] = { ...products[index], ...updatedFields };
+        await this.saveProducts(products);
+        return products[index];
     }
 
     return "No se encontro el producto"; // No se encontró el producto con el ID especificado.
@@ -67,16 +69,22 @@ class ProductManager {
   //metodo deleteProduct donde recibe el id y elimina el objeto
   async deleteProduct(id) {
     const products = await this.getProducts();
-    //se obtendra todos los productos excepto el que sera eliminado
+    //se filtra todos los productos excepto el que sera eliminado
     const updatedProducts = products.filter(product => product.id !== id);
     //se guardaran todos excepto el eliminado
     await this.saveProducts(updatedProducts);
   }
 
+  //metodo para guardar producto
   async saveProducts(products) {
-    await fs.promises.writeFile(this.path, JSON.stringify(products, null, 2), 'utf-8');
+    await fs.promises.writeFile(this.path, JSON.stringify(products), 'utf-8');
   }
 }
+
+
+//**PROCESO DE TESTING**//
+
+
 
 // Se creará una instancia de la clase “ProductManager”
 const productManager = new ProductManager('productos.json');
@@ -108,7 +116,7 @@ Se llamará al método “addProduct” con los campos:
   console.log('Todos los productos:', allProducts);
 
   //Se llamará al método “getProductById” y se corroborará que devuelva el producto con el id especificado, en caso de no existir, debe arrojar un error.
-  const productById = await productManager.getProductById(2);
+  const productById = await productManager.getProductById(1);
   console.log('Producto con ID 1:', productById);
 
   //Se llamará al método “updateProduct” y se intentará cambiar un campo de algún producto, se evaluará que no se elimine el id y que sí se haya hecho la actualización.
@@ -117,5 +125,5 @@ Se llamará al método “addProduct” con los campos:
 
   //Se llamará al método “deleteProduct”, se evaluará que realmente se elimine el producto o que arroje un error en caso de no existir.
   await productManager.deleteProduct(1);
-  console.log('Productos después de eliminar el producto con ID 1:', await productManager.getProducts());
+  console.log('Productos exitentes:', await productManager.getProducts());
 })();
